@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anti-Counterfeit Authentication – Prototype</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mut:#667085;--bd:#dde1e7;--ac:#2f5bea;--ok:#12805c;--okb:#e3f6ee;--bad:#b42318;--badb:#fdecea;--wn:#b54708;--wnb:#fff3e0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171c;--card:#1d2128;--tx:#e8eaed;--mut:#9aa3b0;--bd:#2f3541;--ac:#7c9cff;--ok:#5fd3a5;--okb:#12332a;--bad:#ff8a80;--badb:#3a1a18;--wn:#ffb74d;--wnb:#3a2a12}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0}h2{font-size:15px;margin:0 0 10px}p.s{color:var(--mut);margin:0 0 14px;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}
+input,select,button{width:100%;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+button{background:var(--ac);color:#fff;border:0;cursor:pointer;margin-top:10px;font-weight:600}button.g{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--okb);color:var(--ok)}
+.msg{margin-top:10px;padding:10px;border-radius:8px;font-size:14px;display:none}.ok{background:var(--okb);color:var(--ok);display:block}.bad{background:var(--badb);color:var(--bad);display:block}.wn{background:var(--wnb);color:var(--wn);display:block}
+code{font-size:11px;word-break:break-all;color:var(--mut)}#qr{display:flex;justify-content:center;padding:10px;background:#fff;border-radius:8px;margin-top:10px}
+.sc{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12.5px}td,th{text-align:left;padding:6px;border-bottom:1px solid var(--bd);white-space:nowrap}
+#log{max-height:220px;overflow:auto;font:12px/1.6 ui-monospace,Menlo,monospace;color:var(--mut)}
+</style></head><body><main>
+<h1>Anti-Counterfeit Product Authentication</h1>
+<p class="s">Prototype simulation of the <b>ProductAuth</b> smart contract (same rules as contracts/ProductAuth.sol). Switch the acting wallet, register a product, pass it down the chain, then try to verify or clone it.</p>
+
+<div class="card"><div class="row"><div><label>Acting wallet (like switching MetaMask account)</label><select id="who"></select></div>
+<div style="flex:0 0 auto;align-self:end"><span class="badge" id="role"></span></div></div></div>
+
+<div class="grid"><div>
+ <div class="card"><h2>1 · Register product (Manufacturer)</h2>
+  <label>Product name</label><input id="nm" value="Earbuds X">
+  <div class="row"><div><label>Batch</label><input id="bt" value="B-42"></div><div><label>Serial</label><input id="sr" value="SN-001"></div></div>
+  <button id="reg">Register on-chain &amp; generate QR</button><div class="msg" id="m1"></div>
+  <div id="qr" hidden></div><code id="qid"></code></div>
+
+ <div class="card"><h2>2 · Transfer custody (current owner)</h2>
+  <label>Product</label><select id="tp"></select><label>Send to</label><select id="to"></select>
+  <button id="tx">Transfer</button><div class="msg" id="m2"></div></div>
+</div><div>
+ <div class="card"><h2>3 · Verify a QR (consumer / anyone)</h2>
+  <label>Product ID from QR</label><select id="vp"></select>
+  <div class="row"><button class="g" id="ver">Verify (free read)</button><button id="scan">Scan (on-chain)</button></div>
+  <div class="msg" id="m3"></div>
+  <p class="s" style="margin-top:10px">Clone test: sell a product to Consumer A, then switch to Consumer B and scan the same QR.</p></div>
+ <div class="card"><h2>Role permissions</h2><div class="sc"><table id="perm"></table></div></div>
+</div></div>
+
+<div class="card"><h2>Products on the ledger</h2><div class="sc"><table id="tbl"></table></div></div>
+<div class="card"><h2>Event log</h2><div id="log"></div></div>
+</main>
+<script>
+// ---- in-browser model of the contract ----
+const ST=["Manufactured","At distributor","At retailer","Sold to consumer"];
+const ACC=[["Admin","0xAd01","ADMIN"],["Acme Electronics","0xAcMe","MANUFACTURER"],["FastMove Distributors","0xD157","DISTRIBUTOR"],["CityMart Retail","0x4E7A","RETAILER"],["Consumer A","0xC0A1","CONSUMER"],["Consumer B","0xC0B2","CONSUMER"]];
+const NEXT={0:"DISTRIBUTOR",1:"RETAILER",2:"CONSUMER"};
+const P={},H={};let log=[];
+const me=()=>ACC[+$("who").value],$=i=>document.getElementById(i);
+const hash=s=>{let h=[0x811c9dc5,0x1b873593,0xcc9e2d51,0x85ebca6b,0x27d4eb2f,0x165667b1,0x9e3779b9,0xc2b2ae35];for(let i=0;i<s.length;i++)h=h.map((x,k)=>Math.imul(x^s.charCodeAt(i)+k,16777619)>>>0);return"0x"+h.map(x=>x.toString(16).padStart(8,"0")).join("")};
+const short=a=>a.slice(0,10)+"…"+a.slice(-6),nameOf=a=>ACC.find(x=>x[1]===a)?.[0]||a;
+const say=(el,c,t)=>{$(el).className="msg "+c;$(el).textContent=t};
+const ev=t=>{log.unshift(new Date().toLocaleTimeString()+"  "+t);$("log").innerHTML=log.map(l=>"<div>"+l+"</div>").join("")};
+const revert=(el,e)=>{say(el,"bad","Transaction reverted: "+e);ev("REVERT "+e)};
+
+function register(){const [n,a,r]=me();if(r!=="MANUFACTURER")return revert("m1","AccessControlUnauthorizedAccount ("+n+" is "+r+")");
+ const id=hash(a+"|"+$("sr").value);if(P[id])return revert("m1","AlreadyRegistered");
+ P[id]={name:$("nm").value,batch:$("bt").value,mfr:a,owner:a,stage:0,flag:false,scans:0};H[id]=[[null,a,0]];
+ say("m1","ok","Registered. QR now encodes the on-chain ID.");ev("ProductRegistered "+short(id)+" by "+n);
+ const q=$("qr");q.hidden=false;q.innerHTML="";new QRCode(q,{text:JSON.stringify({c:"0xProductAuth",id}),width:150,height:150});$("qid").textContent=id;refresh()}
+function transfer(){const [n,a]=me(),id=$("tp").value,to=ACC.find(x=>x[1]===$("to").value),p=P[id];
+ if(!p)return revert("m2","NotRegisteredProduct");if(p.owner!==a)return revert("m2","NotCurrentOwner");
+ if(p.stage===3)return revert("m2","AlreadySold");if(to[2]!==NEXT[p.stage])return revert("m2","RecipientHasWrongRole (needs "+NEXT[p.stage]+")");
+ H[id].push([a,to[1],++p.stage]);p.owner=to[1];say("m2","ok","Custody moved to "+to[0]+" → "+ST[p.stage]);ev("ProductTransferred "+short(id)+" "+n+" → "+to[0]);refresh()}
+function verdict(id,write){const p=P[id];if(!p)return["bad","NOT REGISTERED – no such product on the ledger. Treat as counterfeit."];
+ if(write)p.scans++;
+ if(p.stage===3){if(p.owner===me()[1])return["ok","GENUINE – you are the registered owner of this item."];
+  if(write){p.flag=true;ev("ReuseDetected "+short(id)+" scanner "+me()[0])}
+  return["wn","ALREADY CLAIMED by "+nameOf(p.owner)+(write?" – reuse flagged on-chain. This unit is likely a clone.":" – this code belongs to an earlier buyer.")]}
+ return["ok","GENUINE – "+p.name+", currently "+ST[p.stage].toLowerCase()+" with "+nameOf(p.owner)+"."]}
+function check(w){const id=$("vp").value;if(!id)return say("m3","bad","Register a product first.");const [c,t]=verdict(id,w);say("m3",c,t);if(w)ev("ProductScanned "+short(id)+" by "+me()[0]);refresh()}
+
+function refresh(){const ids=Object.keys(P),opt=ids.map(i=>`<option value="${i}">${P[i].name} · ${P[i].batch} · ${short(i)}</option>`).join("");
+ [["tp"],["vp"]].forEach(([k])=>{const v=$(k).value;$(k).innerHTML=opt||"<option value=''>— none yet —</option>";if(v)$(k).value=v});
+ $("role").textContent=me()[2];
+ $("tbl").innerHTML="<tr><th>Product</th><th>Stage</th><th>Owner</th><th>Scans</th><th>Flag</th><th>Custody trail</th></tr>"+ids.map(i=>{const p=P[i];return`<tr><td>${p.name} <code>${short(i)}</code></td><td>${ST[p.stage]}</td><td>${nameOf(p.owner)}</td><td>${p.scans}</td><td>${p.flag?"⚠ cloned QR":"–"}</td><td>${H[i].map(h=>nameOf(h[1])).join(" → ")}</td></tr>`}).join("")}
+$("who").innerHTML=ACC.map((a,i)=>`<option value="${i}">${a[0]} (${a[2]})</option>`).join("");$("who").value=1;
+$("to").innerHTML=ACC.slice(2).map(a=>`<option value="${a[1]}">${a[0]} (${a[2]})</option>`).join("");
+$("perm").innerHTML="<tr><th>Role</th><th>Can do</th></tr>"+[["Manufacturer","Register products, send to distributor"],["Distributor","Send to retailer only"],["Retailer","Sell to consumer only"],["Consumer","Verify / scan; own the item"],["Admin","Grant business roles"]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
+$("who").onchange=refresh;$("reg").onclick=register;$("tx").onclick=transfer;$("ver").onclick=()=>check(false);$("scan").onclick=()=>check(true);refresh();
+</script></body></html>

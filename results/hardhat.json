@@ -1,0 +1,138 @@
+{
+  "network": "hardhat",
+  "chainId": 31337,
+  "contract": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "at": "2026-10-27T18:35:57.455Z",
+  "meanConfirmMs": 5,
+  "totalGas": 2141880,
+  "totalFeeEth": 0.003674453098501238,
+  "read": {
+    "runs": 10,
+    "avgMs": 1,
+    "minMs": 1,
+    "maxMs": 3,
+    "verdict": "AlreadyClaimed"
+  },
+  "rows": [
+    {
+      "step": "deploy",
+      "gasUsed": 1391830,
+      "gasPriceGwei": 1.875,
+      "feeEth": 0.00260968125,
+      "submitMs": 0,
+      "confirmMs": 36,
+      "block": 1,
+      "txHash": "0x982201ab27dc57eae4be9d7a2432bdca620624da81e73baac970fa0a187a2a5d"
+    },
+    {
+      "step": "grantRole MANUFACTURER",
+      "gasUsed": 51440,
+      "gasPriceGwei": 1.770699381,
+      "feeEth": 0.00009108477615864,
+      "submitMs": 9,
+      "confirmMs": 10,
+      "block": 2,
+      "txHash": "0xf272ba3c1f78e7bb26580f4f174f4358303a1db8b5b34148d8aed0e8413b725c"
+    },
+    {
+      "step": "grantRole DISTRIBUTOR",
+      "gasUsed": 51440,
+      "gasPriceGwei": 1.674527145,
+      "feeEth": 0.0000861376763388,
+      "submitMs": 6,
+      "confirmMs": 6,
+      "block": 3,
+      "txHash": "0x1c86128bec935d91820a5ef2a0c0d386b1ba18f50af052765b2a2ef61e525c4f"
+    },
+    {
+      "step": "grantRole RETAILER",
+      "gasUsed": 51428,
+      "gasPriceGwei": 1.590355826,
+      "feeEth": 0.000081788819419528,
+      "submitMs": 4,
+      "confirmMs": 5,
+      "block": 4,
+      "txHash": "0xd8444e28a4165dc285a6e7bf79a70a2a864584624bf057beb77b7392b73a7662"
+    },
+    {
+      "step": "joinAsConsumer (buyer)",
+      "gasUsed": 45931,
+      "gasPriceGwei": 1.516687852,
+      "feeEth": 0.000069662989730212,
+      "submitMs": 3,
+      "confirmMs": 3,
+      "block": 5,
+      "txHash": "0xcfdd5a244c22d959310918efb4a3133a077ebb08ac188794e1e27e3f8a20a2a5"
+    },
+    {
+      "step": "joinAsConsumer (attacker)",
+      "gasUsed": 45931,
+      "gasPriceGwei": 1.452200754,
+      "feeEth": 0.000066701032831974,
+      "submitMs": 3,
+      "confirmMs": 3,
+      "block": 6,
+      "txHash": "0x4b3b8f8ad0f4e6233c5de4d8eb9694afdce85256b7138cb8b8a9f0509893a3ef"
+    },
+    {
+      "step": "registerProduct",
+      "gasUsed": 189465,
+      "gasPriceGwei": 1.395762202,
+      "feeEth": 0.00026444808560193,
+      "submitMs": 5,
+      "confirmMs": 6,
+      "block": 7,
+      "txHash": "0x63b3b33c3b66bc10b7135f327d0a8a08870ed9fa58479040bb92495a704c42c3"
+    },
+    {
+      "step": "transfer maker->distributor",
+      "gasUsed": 84178,
+      "gasPriceGwei": 1.346604357,
+      "feeEth": 0.000113354461563546,
+      "submitMs": 4,
+      "confirmMs": 6,
+      "block": 8,
+      "txHash": "0x59d302796e6533fd890495586c31706387b5eafb8b65fab7562d8da4e4464727"
+    },
+    {
+      "step": "transfer distributor->retailer",
+      "gasUsed": 84166,
+      "gasPriceGwei": 1.303400381,
+      "feeEth": 0.000109701996467246,
+      "submitMs": 3,
+      "confirmMs": 3,
+      "block": 9,
+      "txHash": "0x4ee982ccc1dcb81910050f1439897bb3865359b45c6c4c521086c8f21fd0fb37"
+    },
+    {
+      "step": "transfer retailer->consumer",
+      "gasUsed": 84178,
+      "gasPriceGwei": 1.265581734,
+      "feeEth": 0.000106534139204652,
+      "submitMs": 3,
+      "confirmMs": 4,
+      "block": 10,
+      "txHash": "0x559c6c4363906617ad2dbd61483aff4916a772e7ea79bae5a94ff57dbbf925a9"
+    },
+    {
+      "step": "scanProduct (owner)",
+      "gasUsed": 30070,
+      "gasPriceGwei": 1.232477168,
+      "feeEth": 0.00003706058844176,
+      "submitMs": 4,
+      "confirmMs": 8,
+      "block": 11,
+      "txHash": "0xc14cbf634ab6d830fcbad4fd12a4ecbbee855cd9c3d81da34649af541bc1fc87"
+    },
+    {
+      "step": "scanProduct (cloned QR)",
+      "gasUsed": 31823,
+      "gasPriceGwei": 1.20344665,
+      "feeEth": 0.00003829728274295,
+      "submitMs": 3,
+      "confirmMs": 3,
+      "block": 12,
+      "txHash": "0x0ddac101a3725ed125baa79738de638ae68ee36d941fbe1afeb24a4e32a344c3"
+    }
+  ]
+}

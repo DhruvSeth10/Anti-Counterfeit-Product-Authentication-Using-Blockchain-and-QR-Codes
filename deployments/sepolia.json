@@ -1,0 +1,12 @@
+{
+  "network": "sepolia",
+  "address": "0xb4065B2232ce84ca96E0361aBa1e79dC44781Ed8",
+  "deployer": "0xe03D42803E574BAC19e7F7f758fe8d137522944E",
+  "txHash": "0x173c4ccdf1ca07cb4c56cf0e046e5aa82b9454e169c914f6f5647625bdf64ab9",
+  "block": 12007278,
+  "gasUsed": "9704700",
+  "effectiveGasPriceGwei": "1.0",
+  "feeEth": "0.0097047",
+  "confirmMs": 5032,
+  "at": "2026-10-27T19:39:24.649Z"
+}

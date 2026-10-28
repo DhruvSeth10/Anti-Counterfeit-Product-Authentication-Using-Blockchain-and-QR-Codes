@@ -1,0 +1,38 @@
+// Human-readable ABI of the deployed ProductAuth contract (mirrors contracts/ProductAuth.sol + OZ AccessControl).
+// Used as a fallback when artifacts/ProductAuth.json is not available next to the frontend.
+const P = "tuple(address manufacturer,address owner,uint8 stage,bool exists,bool flagged,uint32 scanCount,uint64 registeredAt,string name,string batch)";
+const C = "tuple(address from,address to,uint8 stage,uint64 at)";
+export const ABI = [
+  "function DEFAULT_ADMIN_ROLE() view returns (bytes32)",
+  "function MANUFACTURER_ROLE() view returns (bytes32)",
+  "function DISTRIBUTOR_ROLE() view returns (bytes32)",
+  "function RETAILER_ROLE() view returns (bytes32)",
+  "function CONSUMER_ROLE() view returns (bytes32)",
+  "function supportsInterface(bytes4 interfaceId) view returns (bool)",
+  "function hasRole(bytes32 role,address account) view returns (bool)",
+  "function getRoleAdmin(bytes32 role) view returns (bytes32)",
+  "function grantRole(bytes32 role,address account)",
+  "function revokeRole(bytes32 role,address account)",
+  "function renounceRole(bytes32 role,address callerConfirmation)",
+  "function joinAsConsumer()",
+  "function registerProduct(string name,string batch,string serial) returns (bytes32 id)",
+  "function transferProduct(bytes32 id,address to)",
+  "function verifyProduct(bytes32 id) view returns (uint8)",
+  "function scanProduct(bytes32 id) returns (uint8 v)",
+  `function getProduct(bytes32 id) view returns (${P})`,
+  `function getHistory(bytes32 id) view returns (${C}[])`,
+  "event RoleAdminChanged(bytes32 indexed role,bytes32 indexed previousAdminRole,bytes32 indexed newAdminRole)",
+  "event RoleGranted(bytes32 indexed role,address indexed account,address indexed sender)",
+  "event RoleRevoked(bytes32 indexed role,address indexed account,address indexed sender)",
+  "event ProductRegistered(bytes32 indexed id,address indexed manufacturer,string name)",
+  "event ProductTransferred(bytes32 indexed id,address indexed from,address indexed to,uint8 stage)",
+  "event ProductScanned(bytes32 indexed id,address indexed scanner,uint8 verdict)",
+  "event ReuseDetected(bytes32 indexed id,address indexed scanner)",
+  "error AlreadyRegistered()",
+  "error NotRegisteredProduct()",
+  "error NotCurrentOwner()",
+  "error AlreadySold()",
+  "error RecipientHasWrongRole()",
+  "error AccessControlUnauthorizedAccount(address account,bytes32 neededRole)",
+  "error AccessControlBadConfirmation()",
+];

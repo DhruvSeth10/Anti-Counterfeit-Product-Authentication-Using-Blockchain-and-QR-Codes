@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AuthChain — Anti-Counterfeit Product Authentication</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">⛓</span><div><strong>AuthChain</strong><small>Anti-counterfeit DApp</small></div></div>
+    <div id="who" class="who"></div>
+    <nav id="nav"></nav>
+    <div class="side-foot"><span id="contractPill">—</span><br>Sepolia · MetaMask · ethers.js</div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div class="top-left">
+        <div id="status" class="pill off"><i></i><span>Not connected</span></div>
+        <div id="roleChips" class="chips"></div>
+      </div>
+      <button id="connectBtn" class="btn primary">Connect MetaMask</button>
+    </header>
+    <div id="banner" class="banner" hidden></div>
+    <section id="view" class="view"></section>
+  </main>
+
+  <script src="vendor/ethers.umd.min.js"></script>
+  <script src="vendor/qrcode.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
