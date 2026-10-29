@@ -34,6 +34,3 @@
 
 ## Measured on local Hardhat network
 register ~ 189k gas, transfer ~ 84k gas, scan ~ 30k gas. Sepolia numbers go in `results/sepolia.md` after step 3.
-
-## Next steps (Phase II/III)
-React front end with ethers.js + MetaMask, camera QR scanning (html5-qrcode).
